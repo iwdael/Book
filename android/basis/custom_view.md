@@ -2,6 +2,61 @@
 
 ![img](http://upload-images.jianshu.io/upload_images/3985563-5f3c64af676d9aee.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
+```java
+public class View implements Drawable.Callback, KeyEvent.Callback,AccessibilityEventSource {
+    public final void measure(int widthMeasureSpec, int heightMeasureSpec) {
+        ···
+        onMeasure(widthMeasureSpec, heightMeasureSpec);
+        ···
+    }
+    
+    ···
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        setMeasuredDimension(getDefaultSize(getSuggestedMinimumWidth(), widthMeasureSpec),
+                getDefaultSize(getSuggestedMinimumHeight(), heightMeasureSpec));
+    }  
+    
+    public void layout(int l, int t, int r, int b) {
+        ···
+        onLayout(changed, l, t, r, b);
+        ···
+    }
+    
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+    }
+    
+    public void draw(Canvas canvas) {
+        ···
+        onDraw(canvas);
+        ···
+    }
+    
+    protected void onDraw(Canvas canvas) {
+    }
+}
+```
+
+```java
+public abstract class ViewGroup extends View implements ViewParent, ViewManager {
+
+    @Override
+    public final void layout(int l, int t, int r, int b) {
+        if (!mSuppressLayout && (mTransition == null || !mTransition.isChangingLayout())) {
+            if (mTransition != null) {
+                mTransition.layoutChange(this);
+            }
+            super.layout(l, t, r, b);
+        } else {
+            // record the fact that we noop'd it; request layout when transition finishes
+            mLayoutCalledWhileSuppressed = true;
+        }
+    }
+    
+        @Override
+    protected abstract void onLayout(boolean changed,int l, int t, int r, int b);
+
+}
+```
 View的绘制是从上往下一层层迭代下来的。DecorView-->ViewGroup（--->ViewGroup）-->View ，按照这个流程从上往下，依次measure(测量),layout(布局),draw(绘制)。
 
 ![img](http://upload-images.jianshu.io/upload_images/3985563-a7ace6f9221c9d79.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
