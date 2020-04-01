@@ -1,4 +1,53 @@
 ## 一、 基础认知
+```Java
+public class Activity extends ContextThemeWrapper implements LayoutInflater.Factory2,Window.Callback, KeyEvent.Callback,OnCreateContextMenuListener, ComponentCallbacks2,Window.OnWindowDismissedCallback, WindowControllerCallback,AutofillManager.AutofillClient {
+        
+        
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            onUserInteraction();
+        }
+        if (getWindow().superDispatchTouchEvent(ev)) {
+            return true;
+        }
+        return onTouchEvent(ev);
+    }
+    
+    ···
+    
+    public void onUserInteraction() {
+    }
+
+    ···
+    public boolean onTouchEvent(MotionEvent event) {
+        if (mWindow.shouldCloseOnTouch(this, event)) {
+            finish();
+            return true;
+        }
+
+        return false;
+    }
+}        
+```
+
+```Java
+public class PhoneWindow extends Window implements MenuBuilder.Callback {
+
+    @Override
+    public boolean superDispatchTouchEvent(MotionEvent event) {
+        return mDecor.superDispatchTouchEvent(event);
+    } 
+}
+```
+```Java
+public class DecorView extend ViewGroup {
+
+    public boolean superDispatchTouchEvent(MotionEvent ev){
+        return super.dispatchTouchEvent(ev);
+    }
+}
+
+```
 
 ### 1.1 事件分发的对象是谁？
 
